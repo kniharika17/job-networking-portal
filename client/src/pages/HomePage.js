@@ -1,10 +1,10 @@
+// client/src/pages/HomePage.js
 import React from "react";
 
 const HomePage = () => {
   return (
     <div>
-      <h1>Welcome to the Job Networking Portal</h1>
-      <p>This is the homepage.</p>
+      <h1>Welcome to Job Networking Portal</h1>
     </div>
   );
 };
