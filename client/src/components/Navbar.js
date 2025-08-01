@@ -28,6 +28,7 @@ const Navbar = () => {
 
         {isLoggedIn ? (
           <>
+            <li><Link to="/my-applications">My Applications</Link></li>
             <li><Link to="/profile">Profile</Link></li>
             <li>
               <button onClick={handleLogout} className="logout-button">
