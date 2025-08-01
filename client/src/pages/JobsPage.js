@@ -1,12 +1,12 @@
 // client/src/pages/JobsPage.js
 
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../styles/JobsPage.css";
 
 const JobsPage = () => {
   const [jobs, setJobs] = useState([]);
-  const navigate = useNavigate(); // ✅ Use inside component
+  const navigate = useNavigate();
 
   useEffect(() => {
     const dummyJobs = [
@@ -17,19 +17,20 @@ const JobsPage = () => {
     setJobs(dummyJobs);
   }, []);
 
-  const handleApply = (job) => {
+  const handleApply = (e, job) => {
+    e.preventDefault(); // Prevent link click
+
     const token = localStorage.getItem("token");
-  
+
     if (!token) {
       alert("Please login or signup to apply for jobs.");
       navigate("/login");
       return;
     }
-  
-    // ✅ Save to localStorage
+
     const existing = JSON.parse(localStorage.getItem("appliedJobs")) || [];
     const alreadyApplied = existing.find((j) => j.id === job.id);
-  
+
     if (!alreadyApplied) {
       const updated = [...existing, job];
       localStorage.setItem("appliedJobs", JSON.stringify(updated));
@@ -38,24 +39,28 @@ const JobsPage = () => {
       alert("You have already applied for this job.");
     }
   };
-  
-  
 
   return (
     <div className="jobs-page">
       <h2>Available Job Listings</h2>
       {jobs.map((job) => (
-        <div key={job.id} className="job-card">
-          <h3>{job.title}</h3>
-          <p><strong>Company:</strong> {job.company}</p>
-          <p><strong>Location:</strong> {job.location}</p>
-          <button
-            onClick={() => handleApply(job)}
-            className="apply-button"
-          >
-            Apply
-          </button>
-        </div>
+        <Link
+          to={`/jobs/${job.id}`}
+          key={job.id}
+          style={{ textDecoration: "none", color: "inherit" }}
+        >
+          <div className="job-card">
+            <h3>{job.title}</h3>
+            <p><strong>Company:</strong> {job.company}</p>
+            <p><strong>Location:</strong> {job.location}</p>
+            <button
+              onClick={(e) => handleApply(e, job)}
+              className="apply-button"
+            >
+              Apply
+            </button>
+          </div>
+        </Link>
       ))}
     </div>
   );
