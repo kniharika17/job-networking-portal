@@ -1,35 +1,23 @@
-// client/src/components/SignupForm.js
-
 import React, { useState } from "react";
 
 const SignupForm = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: ""
-  });
-
+  const [formData, setFormData] = useState({ name: "", email: "", password: "" });
+  const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
+    setMessage("");
     setError("");
-    setSuccess("");
 
     try {
       const res = await fetch("http://localhost:5050/api/auth/signup", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)
       });
 
@@ -39,7 +27,7 @@ const SignupForm = () => {
         throw new Error(data.message || "Signup failed");
       }
 
-      setSuccess("Signup successful! You can now log in.");
+      setMessage("Signup successful! You can now log in.");
       setFormData({ name: "", email: "", password: "" });
     } catch (err) {
       setError(err.message);
@@ -49,11 +37,11 @@ const SignupForm = () => {
   return (
     <div>
       <h2>Signup</h2>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSignup}>
         <input
           name="name"
           type="text"
-          placeholder="Full Name"
+          placeholder="Name"
           value={formData.name}
           onChange={handleChange}
           required
@@ -79,8 +67,9 @@ const SignupForm = () => {
         <br />
         <button type="submit">Signup</button>
       </form>
-      {success && <p style={{ color: "green" }}>{success}</p>}
+
       {error && <p style={{ color: "red" }}>{error}</p>}
+      {message && <p style={{ color: "green" }}>{message}</p>}
     </div>
   );
 };
