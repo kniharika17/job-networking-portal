@@ -1,0 +1,24 @@
+/* client/src/styles/LoginForm.css */
+.login-form {
+    max-width: 400px;
+    margin: 40px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    text-align: center;
+  }
+  
+  .login-form input,
+  .login-form button {
+    padding: 10px;
+    margin: 8px 0;
+    width: 100%;
+  }
+  
+  .login-form button {
+    background-color: #1e88e5;
+    color: white;
+    border: none;
+    border-radius: 5px;
+  }
+  

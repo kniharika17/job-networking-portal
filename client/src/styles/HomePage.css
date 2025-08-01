@@ -1,0 +1,11 @@
+/* client/src/styles/HomePage.css */
+.home {
+    text-align: center;
+    margin-top: 60px;
+  }
+  
+  .home h1 {
+    font-size: 2.5rem;
+    color: #333;
+  }
+  

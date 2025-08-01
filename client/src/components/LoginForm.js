@@ -1,4 +1,5 @@
 // client/src/components/LoginForm.js
+import "../styles/LoginForm.css";
 
 import React, { useState } from "react";
 
@@ -59,7 +60,7 @@ const LoginForm = () => {
   };
 
   return (
-    <div>
+    <div className="login-form">
       <h2>Login</h2>
       {!profile && (
   <form onSubmit={handleLogin}>

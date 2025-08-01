@@ -1,0 +1,24 @@
+/* client/src/styles/SignupForm.css */
+.signup-form {
+    max-width: 400px;
+    margin: 40px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    text-align: center;
+  }
+  
+  .signup-form input,
+  .signup-form button {
+    padding: 10px;
+    margin: 8px 0;
+    width: 100%;
+  }
+  
+  .signup-form button {
+    background-color: #43a047;
+    color: white;
+    border: none;
+    border-radius: 5px;
+  }
+  

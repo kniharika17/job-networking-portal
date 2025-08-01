@@ -1,3 +1,6 @@
+import "../styles/SignupForm.css";
+
+
 import React, { useState } from "react";
 
 const SignupForm = () => {
@@ -35,7 +38,7 @@ const SignupForm = () => {
   };
 
   return (
-    <div>
+    <div className="signup-form">
       <h2>Signup</h2>
       <form onSubmit={handleSignup}>
         <input
