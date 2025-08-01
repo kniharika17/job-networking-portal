@@ -6,12 +6,12 @@ import "../styles/Navbar.css";
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation(); // detects route change
+  const location = useLocation();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
-  }, [location]); // refresh status whenever route changes
+  }, [location]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -24,10 +24,16 @@ const Navbar = () => {
       <div className="navbar-logo">JobConnect</div>
       <ul className="navbar-links">
         <li><Link to="/">Home</Link></li>
+        <li><Link to="/jobs">Jobs</Link></li> {/* Always visible */}
+
         {isLoggedIn ? (
           <>
             <li><Link to="/profile">Profile</Link></li>
-            <li><button onClick={handleLogout} className="logout-button">Logout</button></li>
+            <li>
+              <button onClick={handleLogout} className="logout-button">
+                Logout
+              </button>
+            </li>
           </>
         ) : (
           <>
