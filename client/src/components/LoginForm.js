@@ -57,6 +57,7 @@ const LoginForm = () => {
       }
 
       setProfile(data);
+      localStorage.setItem("profile", JSON.stringify(data));
       navigate("/profile");
     } catch (err) {
       setError(err.message);
