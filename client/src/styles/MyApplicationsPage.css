@@ -1,0 +1,27 @@
+/* client/src/styles/MyApplicationsPage.css */
+
+.applications-page {
+    padding: 20px;
+    max-width: 700px;
+    margin: 0 auto;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+  }
+  
+  .applications-page h2 {
+    text-align: center;
+    color: #333;
+  }
+  
+  .applications-page ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .applications-page li {
+    margin: 10px 0;
+    padding: 10px;
+    background: #e6f2ff;
+    border-radius: 5px;
+  }
+  
