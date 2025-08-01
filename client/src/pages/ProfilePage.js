@@ -1,48 +1,18 @@
 // client/src/pages/ProfilePage.js
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React from "react";
+import "../styles/ProfilePage.css";
 
 const ProfilePage = () => {
-  const navigate = useNavigate();
-  const [profile, setProfile] = useState(null);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      navigate("/login"); // redirect if not logged in
-      return;
-    }
-
-    fetch("http://localhost:5050/api/user/profile", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.message) {
-          setError(data.message);
-          navigate("/login");
-        } else {
-          setProfile(data);
-        }
-      })
-      .catch(() => {
-        setError("Something went wrong");
-        navigate("/login");
-      });
-  }, [navigate]);
-
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
-  if (!profile) return <p>Loading profile...</p>;
+  // Dummy profile info (optional fallback if localStorage lacks token-based fetch)
+  const user = JSON.parse(localStorage.getItem("profile")) || {};
 
   return (
-    <div>
-      <h2>My Profile</h2>
-      <p><strong>Name:</strong> {profile.name}</p>
-      <p><strong>Email:</strong> {profile.email}</p>
+    <div className="profile-page">
+      <h2>Profile</h2>
+      <div className="profile-card">
+        <p><strong>Name:</strong> {user.name || "N/A"}</p>
+        <p><strong>Email:</strong> {user.email || "N/A"}</p>
+      </div>
     </div>
   );
 };
