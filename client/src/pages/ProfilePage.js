@@ -1,37 +1,50 @@
-// src/pages/ProfilePage.js
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+// client/src/pages/ProfilePage.js
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-function ProfilePage() {
-  const [user, setUser] = useState(null);
+const ProfilePage = () => {
   const navigate = useNavigate();
+  const [profile, setProfile] = useState(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
+
     if (!token) {
-      navigate('/login');
+      navigate("/login"); // redirect if not logged in
       return;
     }
 
-    axios.get('http://localhost:5050/api/user/profile', {
-      headers: { Authorization: `Bearer ${token}` }
+    fetch("http://localhost:5050/api/user/profile", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     })
-    .then(res => setUser(res.data))
-    .catch(err => {
-      localStorage.removeItem('token');
-      navigate('/login');
-    });
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.message) {
+          setError(data.message);
+          navigate("/login");
+        } else {
+          setProfile(data);
+        }
+      })
+      .catch(() => {
+        setError("Something went wrong");
+        navigate("/login");
+      });
   }, [navigate]);
 
-  return user ? (
+  if (error) return <p style={{ color: "red" }}>{error}</p>;
+  if (!profile) return <p>Loading profile...</p>;
+
+  return (
     <div>
-      <h2>Welcome, {user.name}!</h2>
-      <p>Email: {user.email}</p>
+      <h2>My Profile</h2>
+      <p><strong>Name:</strong> {profile.name}</p>
+      <p><strong>Email:</strong> {profile.email}</p>
     </div>
-  ) : (
-    <p>Loading...</p>
   );
-}
+};
 
 export default ProfilePage;
