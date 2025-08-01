@@ -1,9 +1,10 @@
 // client/src/components/LoginForm.js
 import "../styles/LoginForm.css";
-
+import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 
 const LoginForm = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: "", password: "" });
   //const [token, setToken] = useState("");
   const [profile, setProfile] = useState(null);
@@ -30,6 +31,8 @@ const LoginForm = () => {
       if (!res.ok) {
         throw new Error(data.message || "Login failed");
       }
+
+
   
       localStorage.setItem("token", data.token); // ✅ Store token
       fetchProfile(data.token); // ✅ Fetch profile
@@ -54,6 +57,7 @@ const LoginForm = () => {
       }
 
       setProfile(data);
+      navigate("/profile");
     } catch (err) {
       setError(err.message);
     }
