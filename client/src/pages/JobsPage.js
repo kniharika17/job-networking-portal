@@ -1,7 +1,7 @@
 // client/src/pages/JobsPage.js
 
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "../styles/JobsPage.css";
 
 const JobsPage = () => {
@@ -10,57 +10,78 @@ const JobsPage = () => {
 
   useEffect(() => {
     const dummyJobs = [
-      { id: 1, title: "Frontend Developer", company: "Google", location: "Hyderabad" },
-      { id: 2, title: "Backend Developer", company: "Amazon", location: "Bangalore" },
-      { id: 3, title: "Data Analyst", company: "MathCo", location: "Chennai" }
-    ];
+        { jobId: 1, title: "Frontend Developer", company: "Google", location: "Hyderabad" },
+        { jobId: 2, title: "Backend Developer", company: "Amazon", location: "Bangalore" },
+        { jobId: 3, title: "Data Analyst", company: "MathCo", location: "Chennai" },
+        { jobId: 4, title: "AI/ML Intern", company: "NVIDIA", location: "Pune" },
+        { jobId: 5, title: "Full Stack Developer", company: "TCS", location: "Noida" },
+        { jobId: 6, title: "Cloud Engineer", company: "Microsoft", location: "Mumbai" }
+      ];
+      
     setJobs(dummyJobs);
+    localStorage.setItem("jobs", JSON.stringify(dummyJobs)); // for JobDetails fallback
   }, []);
 
-  const handleApply = (e, job) => {
-    e.preventDefault(); // Prevent link click
+  const handleApply = async (e, job) => {
+    e.stopPropagation(); // ✅ prevent parent div click
+    e.preventDefault();
 
     const token = localStorage.getItem("token");
-
     if (!token) {
       alert("Please login or signup to apply for jobs.");
       navigate("/login");
       return;
     }
 
-    const existing = JSON.parse(localStorage.getItem("appliedJobs")) || [];
-    const alreadyApplied = existing.find((j) => j.id === job.id);
+    try {
+      const res = await fetch("http://localhost:5050/api/applications/apply", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(job)
+      });
 
-    if (!alreadyApplied) {
-      const updated = [...existing, job];
-      localStorage.setItem("appliedJobs", JSON.stringify(updated));
-      alert(`Applied to ${job.title} at ${job.company}!`);
-    } else {
-      alert("You have already applied for this job.");
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.message || "Failed to apply");
+        return;
+      }
+
+      alert("Application submitted successfully!");
+    } catch (err) {
+      console.error(err);
+      alert("An error occurred while applying.");
     }
+  };
+
+  const handleJobClick = (job) => {
+    navigate(`/jobs/${job.jobId}`, { state: { job } });
+
   };
 
   return (
     <div className="jobs-page">
       <h2>Available Job Listings</h2>
       {jobs.map((job) => (
-        <Link
-          to={`/jobs/${job.id}`}
+        <div
           key={job.id}
-          style={{ textDecoration: "none", color: "inherit" }}
+          className="job-card"
+          style={{ cursor: "pointer" }}
+          onClick={() => handleJobClick(job)}
         >
-          <div className="job-card">
-            <h3>{job.title}</h3>
-            <p><strong>Company:</strong> {job.company}</p>
-            <p><strong>Location:</strong> {job.location}</p>
-            <button
-              onClick={(e) => handleApply(e, job)}
-              className="apply-button"
-            >
-              Apply
-            </button>
-          </div>
-        </Link>
+          <h3>{job.title}</h3>
+          <p><strong>Company:</strong> {job.company}</p>
+          <p><strong>Location:</strong> {job.location}</p>
+          <button
+            onClick={(e) => handleApply(e, job)}
+            className="apply-button"
+          >
+            Apply
+          </button>
+        </div>
       ))}
     </div>
   );

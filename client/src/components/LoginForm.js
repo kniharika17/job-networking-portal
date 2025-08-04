@@ -27,22 +27,61 @@ const LoginForm = () => {
       });
   
       const data = await res.json();
+      console.log("Login response:", data);
   
       if (!res.ok) {
         throw new Error(data.message || "Login failed");
       }
-
-
   
-      localStorage.setItem("token", data.token); // ✅ Store token
-      fetchProfile(data.token); // ✅ Fetch profile
+      if (data.token) {
+        console.log("Setting token:", data.token);
+        localStorage.setItem("token", data.token);
+        fetchProfile(data.token);
+        const oldLocalJobs = JSON.parse(localStorage.getItem("appliedJobs")) || [];
+
+if (oldLocalJobs.length > 0) {
+  oldLocalJobs.forEach(async (job) => {
+    try {
+      const res = await fetch("http://localhost:5050/api/applications/apply", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${data.token}`
+        },
+        body: JSON.stringify(job)
+      });
+
+      const resData = await res.json();
+      if (res.ok) {
+        console.log(`✅ Synced old application: ${job.title}`);
+      } else {
+        console.log(`⚠️ Already exists or failed: ${job.title}`, resData.message);
+      }
+    } catch (err) {
+      console.error("Error syncing old job:", job.title, err.message);
+    }
+  });
+
+  // Optional: Clear after syncing
+  localStorage.removeItem("appliedJobs");
+}
+
+
+
+
+      } else {
+        throw new Error("No token received from server.");
+      }
     } catch (err) {
       setError(err.message);
     }
   };
+  
 
 
   const fetchProfile = async (jwtToken) => {
+    console.log("Fetching profile with token:", jwtToken);
+
     try {
       const res = await fetch("http://localhost:5050/api/user/profile", {
         headers: {
@@ -60,6 +99,7 @@ const LoginForm = () => {
       localStorage.setItem("profile", JSON.stringify(data));
       navigate("/profile");
     } catch (err) {
+      console.error("Profile fetch failed:", err.message); // ✅ show error
       setError(err.message);
     }
   };

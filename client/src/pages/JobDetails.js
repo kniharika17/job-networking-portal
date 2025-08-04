@@ -1,54 +1,86 @@
-// client/src/pages/JobDetails.js
-
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-
-const dummyJobs = [
-  { id: 1, title: "Frontend Developer", company: "Google", location: "Hyderabad", description: "Build UI using React." },
-  { id: 2, title: "Backend Developer", company: "Amazon", location: "Bangalore", description: "Develop APIs using Node.js." },
-  { id: 3, title: "Data Analyst", company: "MathCo", location: "Chennai", description: "Analyze data with Python and SQL." }
-];
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+import "../styles/JobsPage.css";
 
 const JobDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [job, setJob] = useState(null);
 
   useEffect(() => {
-    const selected = dummyJobs.find((j) => j.id === parseInt(id));
-    setJob(selected);
-  }, [id]);
-
-  const handleApply = () => {
     const token = localStorage.getItem("token");
-
     if (!token) {
-      alert("Please login or signup to apply.");
       navigate("/login");
       return;
     }
 
-    const existing = JSON.parse(localStorage.getItem("appliedJobs")) || [];
-    const alreadyApplied = existing.find((j) => j.id === job.id);
-
-    if (!alreadyApplied) {
-      const updated = [...existing, job];
-      localStorage.setItem("appliedJobs", JSON.stringify(updated));
-      alert(`Applied to ${job.title} at ${job.company}!`);
+    if (location.state?.job) {
+      setJob(location.state.job);
     } else {
-      alert("You have already applied for this job.");
+      const fallbackJobs = JSON.parse(localStorage.getItem("jobs")) || [];
+      const found = fallbackJobs.find((j) => j.id === parseInt(id));
+      setJob(found);
+    }
+  }, [navigate, location, id]);
+
+  const handleApply = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Please log in to apply.");
+      return;
+    }
+
+    const cleanJob = {
+      jobId: job.id, // 👈 backend expects jobId
+      title: job.title,
+      company: job.company,
+      location: job.location
+    };
+
+    try {
+      const res = await fetch("http://localhost:5050/api/applications/apply", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(cleanJob)
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.message || "Failed to apply.");
+        return;
+      }
+
+      // ✅ Store in localStorage
+      const stored = JSON.parse(localStorage.getItem("appliedJobs")) || [];
+      const alreadyExists = stored.some((j) => j.jobId === cleanJob.jobId);
+      if (!alreadyExists) {
+        stored.push(cleanJob);
+        localStorage.setItem("appliedJobs", JSON.stringify(stored));
+      }
+
+      alert("Application submitted successfully!");
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong while applying.");
     }
   };
 
   if (!job) return <p>Loading job details...</p>;
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div className="job-card" style={{ margin: "20px" }}>
       <h2>{job.title}</h2>
       <p><strong>Company:</strong> {job.company}</p>
       <p><strong>Location:</strong> {job.location}</p>
-      <p><strong>Description:</strong> {job.description}</p>
-      <button onClick={handleApply} className="apply-button">Apply</button>
+      <p><strong>Description:</strong> This is a detailed view of the job.</p>
+      <button className="apply-button" onClick={handleApply}>
+        Apply Now
+      </button>
     </div>
   );
 };

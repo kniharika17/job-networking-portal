@@ -14,6 +14,9 @@ app.use(express.json());
 const userRoutes = require('./routes/user');
 app.use('/api/user', userRoutes);
 
+// Inside index.js
+const applicationRoutes = require("./routes/applications");
+app.use("/api/applications", applicationRoutes);
 
 
 // Debug log to verify loading
